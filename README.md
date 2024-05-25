@@ -27,3 +27,14 @@ def backtrack(curr_partition, start):
 backtrack([], 0)
 return result
 ```
+
+`result`: A list to store all the valid partitions.
+
+`backtrack` **Function**: A helper function that performs the actual backtracking.
+
+- `curr_partition`: The current partition being constructed.
+- `start`: The starting index for partitioning the string.
+
+**Base Case**: If `start` reaches the end of the string (`n`), we add the current partition to the result.
+
+**Recursive Case**: We iterate through possible end indices (`end`), generate substrings from `start` to `end`, and check if they are valid using the `is_valid_substring` function. If valid, we recursively call `backtrack` with the new substring added to the current partition. After the recursive call, we backtrack by removing the last added substring.
