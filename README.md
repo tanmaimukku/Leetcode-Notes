@@ -1,12 +1,14 @@
-# Backtracking 
+# Backtracking
+
+Always sketch out the recursion tree in backtracking problems, solving becomes easy from there
 
 ## String Partitioning
 
-- Partition a string into all possible substrings
-- Uses recursive calls to partition and check whatever valid condition needs to be checked (eg. is a palindrome, is present in a dictionary etc.)
-- Example Problems 
+1. Partition a string into all possible substrings
+2. Uses recursive calls to partition and check whatever valid condition needs to be checked (eg. is a palindrome, is present in a dictionary etc.)
+3. Example Problems 
 
-  <table><tbody><tr><th colspan="1" rowspan="1"><p>Problem</p></th><th colspan="1" rowspan="1"><p>Link</p></th></tr><tr><td colspan="1" rowspan="1"><p>Palindrome Partitioning</p></td><td colspan="1" rowspan="1"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://leetcode.com/problems/palindrome-partitioning/description/" title="https://leetcode.com/problems/palindrome-partitioning/description/ (Ctrl or Cmd-click to open)">https://leetcode.com/problems/palindrome-partitioning/description/</a></p></td></tr><tr><td colspan="1" rowspan="1"><p>Word Break II</p></td><td colspan="1" rowspan="1"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://leetcode.com/problems/word-break-ii/description/" title="https://leetcode.com/problems/word-break-ii/description/ (Ctrl or Cmd-click to open)">https://leetcode.com/problems/word-break-ii/description/</a></p></td></tr></tbody></table>
+   <table><tbody><tr><th colspan="1" rowspan="1"><p>Problem</p></th><th colspan="1" rowspan="1"><p>Link</p></th><th colspan="1" rowspan="1"><p>Notes</p></th></tr><tr><td colspan="1" rowspan="1"><p>Palindrome Partitioning</p></td><td colspan="1" rowspan="1"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://leetcode.com/problems/palindrome-partitioning/description/" title="https://leetcode.com/problems/palindrome-partitioning/description/ (Ctrl or Cmd-click to open)">https://leetcode.com/problems/palindrome-partitioning/description/</a></p></td><td colspan="1" rowspan="1"><p>condition is palindrome</p></td></tr><tr><td colspan="1" rowspan="1"><p>Word Break II</p></td><td colspan="1" rowspan="1"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://leetcode.com/problems/word-break-ii/description/" title="https://leetcode.com/problems/word-break-ii/description/ (Ctrl or Cmd-click to open)">https://leetcode.com/problems/word-break-ii/description/</a></p></td><td colspan="1" rowspan="1"><p>condition is present in dictionary</p></td></tr></tbody></table>
 
 ```python
 result = []
@@ -28,13 +30,63 @@ backtrack([], 0)
 return result
 ```
 
+`s`: The input string to be partitioned.
+
+`is_valid_substring`: A function that checks if a given substring is valid (e.g., checks if it is a palindrome or if it is in a dictionary).
+
 `result`: A list to store all the valid partitions.
 
 `backtrack` **Function**: A helper function that performs the actual backtracking.
 
-- `curr_partition`: The current partition being constructed.
-- `start`: The starting index for partitioning the string.
+1. `curr_partition`: The current partition being constructed.
+2. `start`: The starting index for partitioning the string.
 
 **Base Case**: If `start` reaches the end of the string (`n`), we add the current partition to the result.
 
 **Recursive Case**: We iterate through possible end indices (`end`), generate substrings from `start` to `end`, and check if they are valid using the `is_valid_substring` function. If valid, we recursively call `backtrack` with the new substring added to the current partition. After the recursive call, we backtrack by removing the last added substring.
+
+## Subsets
+
+1. Recursively generate all subsets from a given set
+2. Can use 2 principles, 1st is for loop (so subsets starting with element) and 2nd is inclusion exclusion (Add curr to result only at the end)
+3. Can slightly modify the logic on what subsets to include based on any conditions (duplicates etc.)
+4. Example problems
+
+   <table><tbody><tr><th colspan="1" rowspan="1"><p>Problem</p></th><th colspan="1" rowspan="1"><p>Link</p></th><th colspan="1" rowspan="1"><p>Notes</p></th></tr><tr><td colspan="1" rowspan="1"><p>Subsets</p></td><td colspan="1" rowspan="1"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://leetcode.com/problems/subsets/description/" title="https://leetcode.com/problems/subsets/description/ (Ctrl or Cmd-click to open)">https://leetcode.com/problems/subsets/description/</a></p></td><td colspan="1" rowspan="1"><p></p></td></tr><tr><td colspan="1" rowspan="1"><p>Subsets II</p></td><td colspan="1" rowspan="1"><p><a target="_blank" rel="noopener noreferrer nofollow" href="https://leetcode.com/problems/subsets-ii/description/" title="https://leetcode.com/problems/subsets-ii/description/ (Ctrl or Cmd-click to open)">https://leetcode.com/problems/subsets-ii/description/</a></p></td><td colspan="1" rowspan="1"><p>No Duplicate Subsets</p></td></tr></tbody></table>
+
+```python
+result = []
+n = len(nums)
+
+def backtrack(curr_subset, start):
+    # Add the current subset to the result
+    result.append(list(curr_subset))
+    
+    for i in range(start, n):
+        # Include the current element
+        curr_subset.append(nums[i])
+        # Move to the next element
+        backtrack(curr_subset, i + 1)
+        # Exclude the current element (backtrack)
+        curr_subset.pop()
+
+backtrack([], 0)
+return result
+```
+
+`nums`: The input list of numbers from which to generate subsets.
+
+`result`: A list to store all the subsets.
+
+`backtrack` **Function**: A helper function that performs the actual backtracking.
+
+1. `curr_subset`: The current subset being constructed.
+2. `start`: The starting index for the next element to consider.
+
+**Base Case**: Every time we call `backtrack`, we add the current subset (`curr_subset`) to the result.
+
+**Recursive Case**: We iterate through the elements starting from `start` to `n`, include the current element in the subset, and recursively call `backtrack` with the next starting index. After the recursive call, we backtrack by removing the last added element to explore other subsets.
+
+## Permutations
+
+1. Just a slight variation of the combinations problem
