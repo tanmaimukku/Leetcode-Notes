@@ -207,6 +207,36 @@ def edge_list_to_adj_list(edges: list, n: int):
     return adj_list
 ```
 
+## DFS vs BFS
+
+#### **DFS**:
+
+1. **Mark node as visited**: When **popped** from the stack (ready to process). 
+2. **Why?**: Ensures full exploration of neighbors before marking as visited.
+3. **Additional visited check**: Needed before **pushing neighbors onto the stack** to avoid pushing the same node multiple times (because DFS might revisit nodes from different branches). (Only in case of iterative)
+4. **Recursive DFS**:
+   - No need for an additional visited check because the recursion stack inherently manages depth-first traversal, and nodes are marked as visited immediately when the function is called.
+   - The call stack prevents revisiting nodes by the nature of recursion.
+   - In **recursive DFS**, you process the node first, recursively call neighbors, and only after all recursive calls are done does the node "pop" from the stack (when the function returns).
+5. **Iterative DFS**:
+   - Requires two visited checks:
+     1. **Before pushing neighbors** onto the stack, to avoid pushing already visited nodes.
+     2. **Before processing the node** after popping from the stack, to ensure the node is only processed once, even if it's added to the stack multiple times from different paths.
+   - In **iterative DFS**, you pop the node first, process it, then push neighbors to the stack.
+6. The difference arises from how the call stack in recursion automatically manages depth-first exploration compared to manual stack management in iterative DFS, so don't worry too much, just memorize. 
+
+#### **BFS**:
+
+1. **Mark node as visited**: When **enqueued** (immediately after adding to the queue).
+2. **Why?**: BFS processes nodes level by level, so marking when enqueuing prevents revisiting and ensures the shortest path is maintained.
+3. **No additional visited check**: Since nodes are marked visited when enqueued, they won’t be added to the queue again, making an additional check after dequeuing unnecessary.
+
+#### **Key Points**:
+
+1. **DFS** explores deeply; multiple paths might push the same node, so check before pushing.
+2. **BFS** explores level by level; mark when enqueuing to ensure each node is processed once, in the correct order.
+3. **Efficiency**: BFS marking on enqueue is optimal for reducing redundant checks.
+
 ## DFS
 
 1. **DFS magic spell: 1\]push to stack, 2\] pop top , 3\] retrieve unvisited neighbours of top, push them to stack 4\] repeat 1,2,3 while stack not empty. Now form a rap !**
@@ -251,6 +281,8 @@ def dfs(x: int, y: int, visited: set, grid: list):
 ```
 
 ## Iterative DFS (adjacency list)
+
+1. **When you push a node onto the stack**, you're only checking if it's **not visited yet at that moment**. However, **the same node might get added to the stack multiple times** through different paths before it is actually processed. Thats the reason why we check visited both at the beginning and before adding neighbor. Think 1 - 2 - 3 - 4 loop. 
 
 ```python
 visited = set()  # To track visited nodes
@@ -312,7 +344,7 @@ def dfs(node, target, graph, visited, path, all_paths):
     else:
         for neighbor in graph[node]:
             if neighbor not in visited:
-                dfs_with_path(neighbor, target, graph, visited, path, all_paths)
+                dfs(neighbor, target, graph, visited, path, all_paths)
     
     path.pop()  # Backtrack
     visited.remove(node)
@@ -345,7 +377,7 @@ def dfs(x, y, target_x, target_y, grid, visited, path, all_paths):
     visited.remove((x, y))
 ```
 
-## Recursive DFS for topological sort
+## Recursive DFS for topological sort (Directed Graph)
 
 1. Key point is, Once all neighbors of the current node have been processed, the current node is added to the stack.
 2. After performing DFS on all unvisited nodes, the stack will contain the nodes in reverse topological order (because nodes are pushed to the stack after their dependencies have been processed).
@@ -376,7 +408,7 @@ for node in range(n):
 return stack[::-1] 
 ```
 
-## Recursive DFS for Cycle Detection
+## Recursive DFS for Cycle Detection (Directed Graph)
 
 1. Cycle detection is based on the Key point: In the current path, if there is back edge, i.e, node connecting to any previous nodes only in the current path, there is a cycle. 
 2. You cannot use visited to keep track of cycles, i.e claim that if we revisit the node there is a cycle, as a node maybe visited multiple times in DFS. 
@@ -399,3 +431,117 @@ def dfs_cycle(node, graph, visited, recursion_stack):
     recursion_stack.remove(node)
     return False
 ```
+
+## BFS
+
+## BFS (adjacency list)
+
+```python
+visited = set()  # To track visited nodes
+queue = deque([start])  # Initialize the queue with the starting node
+visited.add(start)  # Mark the start node as visited when enqueuing
+
+while queue:
+    node = queue.popleft()  # Dequeue the first node in the queue
+    print(f"Visiting node {node}")  # Process the node (e.g., print or collect data)
+
+    # Enqueue all unvisited neighbors and mark them as visited when enqueuing
+    for neighbor in graph[node]:
+        if neighbor not in visited:
+            queue.append(neighbor)
+            visited.add(neighbor)  # Mark as visited when enqueuing
+```
+
+## BFS (grid)
+
+```python
+visited = set()  # To track visited cells
+queue = deque([(start_x, start_y)])  # Initialize the queue with the starting cell
+visited.add((start_x, start_y))  # Mark the start cell as visited when enqueuing
+
+# Define the directions for neighbors: up, down, left, right
+directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+rows, cols = len(grid), len(grid[0])
+
+while queue:
+    x, y = queue.popleft()  # Dequeue the first cell
+    print(f"Visiting cell ({x}, {y})")  # Process the current cell
+
+    # Enqueue all unvisited valid neighbors
+    for dx, dy in directions:
+        nx, ny = x + dx, y + dy
+        if 0 <= nx < rows and 0 <= ny < cols and (nx, ny) not in visited:
+            queue.append((nx, ny))
+            visited.add((nx, ny))  # Mark as visited when enqueuing
+```
+
+## Multisource BFS
+
+1. The multi-source BFS pattern is useful when you need to start BFS from multiple starting points simultaneously. This pattern ensures that all sources are explored in parallel, and it's commonly used in problems like finding the shortest distance from multiple sources to a destination.
+2. The only change is from normal BFS code is that you add all the source nodes in the queue and call BFS
+
+## Maintaining Level information in BFS
+
+1. Simple way is just to maintain (node, level) instead of just node. Each time you are enqueuing new nodes, increment the level by 1. This way, you have level information for all the nodes. In this method, level information will be lost at the end, as the queue will become empty. It can still be used if you only need the end result, but if you need information like no. of nodes in each level etc., It is better to use level processing approach. 
+2. Other way is using array for levels, like so. Idea is to process nodes level by level, tracking the current level by processing all nodes at the same depth in one batch, and incrementing the level after processing each layer. Useful in tree problems (level order traversal) too.
+
+```python
+visited = set([start])  # Track visited nodes, starting with the source node
+queue = deque([start])  # Queue to store nodes to be processed
+level = 0  # Start from level 0 (the level of the start node)
+
+while queue:
+    # Get the number of nodes at the current level
+    level_size = len(queue)
+    
+    # Process all nodes at the current level
+    for _ in range(level_size):
+        node = queue.popleft()  # Pop a node from the queue
+        print(f"Node: {node}, Level: {level}")
+        
+        # Add unvisited neighbors to the queue
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    
+    # After processing all nodes at the current level, increment the level
+    level += 1
+```
+
+## BFS for topological sort (Cycle detection built in) (Kahn's algorithm)
+
+```python
+graph = defaultdict(list)  # Adjacency list representation of the graph
+in_degree = [0] * n  # In-degree of each node
+
+# Build the graph and calculate in-degrees
+for start, end in edges:
+    graph[start].append(end)
+    in_degree[end] += 1
+
+# Initialize the queue with all nodes that have in-degree of 0
+queue = deque([i for i in range(n) if in_degree[i] == 0])
+topo_order = []
+
+while queue:
+    node = queue.popleft()  # Get the node with zero in-degree
+    topo_order.append(node)  # Add it to the topological order
+    
+    # Reduce in-degree of all its neighbors
+    for neighbor in graph[node]:
+        in_degree[neighbor] -= 1
+        # If a neighbor now has in-degree of 0, add it to the queue
+        if in_degree[neighbor] == 0:
+            queue.append(neighbor)
+
+# If all nodes are processed, return the topological order, otherwise return empty (cycle detected)
+if len(topo_order) == n:
+    return topo_order
+else:
+    return []  # Cycle detected
+```
+
+## Tips and Tricks to Solve graph problems
+
+1. To detect length of cycle or elements in cycle, you can keep track of entry times in the recursive_stack. This can also help you in finding the exact cycle. 
