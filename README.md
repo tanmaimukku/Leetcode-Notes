@@ -542,6 +542,25 @@ else:
     return []  # Cycle detected
 ```
 
+## Eulerian Path/Cycle
+
+1. **Eulerian Path**: If there is exactly one vertex with `out-degree` greater by 1 and one with `in-degree` greater by 1.
+2. **Eulerian Cycle**: If all vertices have equal `in-degree` and `out-degree`
+3. Basically Eulerian Path/Cycle means we cover all edges of a graph exactly once 
+4. The algorithm is simple, we recursively keep removing edges one by one, so no need of visited set as we can revisit a node multiple times, but cannot revisit an edge. More elegant implementations also exist, but this should suffice for this rare problem. 
+
+```python
+def dfs_eularian(node, graph, stack):
+    while graph[node]:
+        next_node = graph[node].pop(0) # Only if lexcial order pop(0), else its fine to pop any neighbor
+        dfs_eularian(next_node)
+    stack.append(node)
+
+# Start DFS from the determined starting airport
+dfs_eularian(start) # For determining start node, follow the instructions in the notes above.
+return stack[::-1]  # Reverse the itinerary to get the correct order
+```
+
 ## Tips and Tricks to Solve graph problems
 
 1. To detect length of cycle or elements in cycle, you can keep track of entry times in the recursive_stack. This can also help you in finding the exact cycle. 
