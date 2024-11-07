@@ -561,6 +561,94 @@ dfs_eularian(start) # For determining start node, follow the instructions in the
 return stack[::-1]  # Reverse the itinerary to get the correct order
 ```
 
+## Disjoint Set Union / Union Find
+
+1. **Purpose**: DSU is used to manage and merge disjoint sets, mainly in graph problems for tracking connected components and detecting cycles.
+2. **Key Operations**:
+   - **Find** with Path Compression: Reduces the time complexity by flattening the tree, so future operations are faster.
+   - **Union by Rank/Size**: Keeps the tree balanced by attaching the smaller tree under the root of the larger one.
+3. **Time Complexity**: Both `find` and `union` have nearly constant time complexity, due to path compression and union by rank
+4. **Common Use Cases**:
+   - **Cycle Detection** in undirected graphs.
+   - **Kruskal’s MST Algorithm** to avoid cycles when adding edges.
+   - **Connected Components** to check if two nodes are in the same component.
+5. **Initialization**: Use two arrays—`parent` (each node points to itself initially) and `rank` (initially 0 for all nodes).
+
+```python
+class DSU:
+    def __init__(self, n):
+        # Initialize parent and rank arrays
+        self.parent = [i for i in range(n)]
+        self.rank = [0] * n
+
+    def find(self, x):
+        # Find the root of the set containing x with path compression
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
+
+    def union(self, x, y):
+        # Union by rank
+        root_x = self.find(x)
+        root_y = self.find(y)
+
+        if root_x != root_y:
+            # Attach smaller rank tree under root of the higher rank tree
+            if self.rank[root_x] > self.rank[root_y]:
+                self.parent[root_y] = root_x
+            elif self.rank[root_x] < self.rank[root_y]:
+                self.parent[root_x] = root_y
+            else:
+                self.parent[root_y] = root_x
+                self.rank[root_x] += 1
+
+    def connected(self, x, y):
+        # Check if two elements are in the same set
+        return self.find(x) == self.find(y)
+```
+
+## Minimum Spanning Trees (MST)
+
+1. An **MST** connects all nodes in an undirected, weighted graph with the minimum possible total edge weight, ensuring there are no cycles and the graph remains fully connected.
+
+## MST Kruskal's
+
+1. **Approach**: Edge-based, Greedy
+2. **Process**:
+   - Sort all edges in non-decreasing order by weight.
+   - Initialize an empty MST and start adding edges from the sorted list.
+   - For each edge, check if it forms a cycle using DSU. If not, add it to the MST.
+   - Repeat until the MST has V-1 exactly edges (where V is the number of vertices).
+3. **Best for**: Sparse graphs where sorting edges is manageable.
+
+```python
+def kruskal_mst_fixed(edges):
+    # Initialize DSU and collect unique nodes to determine number of nodes
+    dsu = DynamicDSU()
+    unique_nodes = set(u for u, v, _ in edges).union(set(v for u, v, _ in edges))
+    num_nodes = len(unique_nodes)
+
+    # Sort edges by weight (ascending order)
+    edges.sort(key=lambda x: x[2])
+
+    mst = []  # To store edges in MST
+    total_cost = 0
+
+    # Iterate through sorted edges
+    for u, v, weight in edges:
+        # Only add edge if it doesn't form a cycle
+        if not dsu.connected(u, v):
+            dsu.union(u, v)  # Union the two vertices
+            mst.append((u, v, weight))  # Add edge to MST
+            total_cost += weight  # Add edge weight to total cost
+
+            # Stop if MST has enough edges (n - 1 edges for n nodes)
+            if len(mst) == num_nodes - 1:
+                break
+
+    return mst, total_cost
+```
+
 ## Tips and Tricks to Solve graph problems
 
 1. To detect length of cycle or elements in cycle, you can keep track of entry times in the recursive_stack. This can also help you in finding the exact cycle. 
