@@ -582,6 +582,13 @@ class DSU:
         self.rank = [0] * n
 
     def find(self, x):
+        '''
+        # Intialize parent and rank as dicts {} if no. of nodes is not known, and just add these lines of code
+        # Initialize parent and rank if node is encountered for the first time
+        if x not in self.parent:
+            self.parent[x] = x
+            self.rank[x] = 0
+        '''
         # Find the root of the set containing x with path compression
         if self.parent[x] != x:
             self.parent[x] = self.find(self.parent[x])
@@ -649,6 +656,307 @@ def kruskal_mst_fixed(edges):
     return mst, total_cost
 ```
 
+## MST Prim's
+
+1. **Approach**: Vertex-based, Greedy
+2. **Process**:
+   - Start from any initial node.
+   - Use a min-heap (priority queue) to track edges that extend from the MST.
+   - Repeatedly pop the minimum edge from the heap:
+     - If it connects to an unvisited node, add it to the MST and add its neighbors to the heap.
+   - Stop when the MST includes all nodes.
+3. **Best for**: Dense graphs with adjacency lists/matrices.
+
+```python
+# Redefining Prim's algorithm for MST with adjacency list input
+def prim_mst(graph, start):
+    # Initialize structures
+    mst = []  # To store the edges in the MST
+    total_cost = 0  # To accumulate the total weight of the MST
+    visited = set()  # Track nodes already included in the MST
+    min_heap = []  # Priority queue (min-heap) for edges
+
+    # Function to add edges to the priority queue
+    def add_edges(node):
+        visited.add(node)
+        for neighbor, weight in graph[node]:
+            if neighbor not in visited:
+                heapq.heappush(min_heap, (weight, node, neighbor))
+
+    # Start from the initial node
+    add_edges(start)
+
+    # Process until MST includes all nodes or min-heap is empty
+    while min_heap and len(visited) < len(graph):
+        weight, u, v = heapq.heappop(min_heap)
+        if v not in visited:  # Only add edge if it connects to an unvisited node
+            mst.append((u, v, weight))
+            total_cost += weight
+            add_edges(v)  # Add edges from the newly added node
+
+    return mst, total_cost
+```
+
+## Shortest Path Dijkstra
+
+1. **Approach**: Single-source shortest path for non-negative weights
+2. **Process**:
+   - Initialize distances from the start node to all other nodes as infinity (except for the start, set to 0).
+   - Use a min-heap to manage nodes by their current shortest distance.
+   - Pop the node with the smallest distance:
+     - For each neighbor, calculate the potential new distance.
+     - If this distance is shorter than the known distance, update it and push the neighbor with the updated distance.
+   - Continue until all reachable nodes have the shortest path from the start.
+3. **Best for**: Shortest paths in non-negative weighted graphs.
+
+```python
+def dijkstra(graph, start):
+    # Initialize distance dictionary with infinity for all nodes except the start
+    distances = {node: float('inf') for node in graph}
+    distances[start] = 0
+
+    # Priority queue (min-heap) initialized with the starting node
+    min_heap = [(0, start)]  # (distance, node)
+
+    while min_heap:
+        # Pop the node with the smallest distance
+        current_distance, u = heapq.heappop(min_heap)
+
+        # Process only if the current distance is the smallest known distance for u
+        if current_distance > distances[u]:
+            continue
+
+        # Check each neighbor of the current node
+        for v, weight in graph[u]:
+            distance = current_distance + weight  # Calculate potential new distance to neighbor
+
+            # Only consider this path if it's shorter than the known distance
+            if distance < distances[v]:
+                distances[v] = distance  # Update to the shorter distance
+                heapq.heappush(min_heap, (distance, v))  # Push updated distance into the heap
+
+    return distances
+```
+
 ## Tips and Tricks to Solve graph problems
 
 1. To detect length of cycle or elements in cycle, you can keep track of entry times in the recursive_stack. This can also help you in finding the exact cycle. 
+2. For **undirected graphs**, cycles are found using DSU or DFS with back edges. For **directed graphs**, cycles are detected through **DFS with recursion stack tracking**.
+
+## Dynamic Programming
+
+1. General tip - In bottom up DP, if 2D DP, draw the matrix and visualize the dependencies, becomes easier.
+2. Sometime memoization is more intuitive, sometime DP is more intuitive. DP you can usually perform space optimization. 
+
+## 0/1 Knapsack Pattern - 
+
+```python
+def knapsack(values, weights, capacity):
+    n = len(values)
+    dp = [[0] * (capacity + 1) for _ in range(n + 1)]
+    
+    # Fill the DP table
+    for i in range(1, n + 1):  # For each item
+        for w in range(1, capacity + 1):  # For each capacity
+            if weights[i - 1] <= w:
+                dp[i][w] = max(dp[i - 1][w], values[i - 1] + dp[i - 1][w - weights[i - 1]]) #i-1 is the actual item
+            else:
+                dp[i][w] = dp[i - 1][w]
+    
+    return dp[n][capacity]
+```
+
+## Unbounded Knapsack Patten - 322, 343, 279
+
+```python
+def unbounded_knapsack(values, weights, capacity):
+    n = len(values)
+    dp = [0] * (capacity + 1)
+    
+    # Fill the DP array
+    for i in range(n):  # For each item
+        for w in range(weights[i], capacity + 1):  # For each capacity
+            dp[w] = max(dp[w], values[i] + dp[w - weights[i]])
+    
+    return dp[capacity]
+```
+
+1. Coin Change II - Since ordering doesnt matter, it is a 2 state problem instead of 1 state. little tricky to catch. You use inclusion/exclusion decision tree, memoization solution is simple to implement. 
+2. If ordering does matter, then it is a simple 1 state solution like Coin Change I
+
+## Fibonacci
+
+1. The Fibonacci pattern shows up in many dynamic programming problems where each state depends on a fixed number of previous states.
+
+```python
+def fibonacci_dp(n):
+    if n <= 1:
+        return n
+    dp = [0] * (n + 1)
+    dp[1] = 1
+    for i in range(2, n + 1):
+        dp[i] = dp[i - 1] + dp[i - 2]
+    return dp[n]
+```
+
+## Longest Palindromic Substring
+
+1. If you know that a substring `s[l+1:r-1]` is a palindrome, then `s[l:r]` is also a palindrome if `s[l] == s[r]`.
+2. In problems involving **palindromic substrings or subsequences**, the goal is often to:
+   - **Identify the longest palindromic substring** (continuous sequence).
+   - **Count the number of palindromic substrings**.
+   - **Find the longest palindromic subsequence** (which doesn’t need to be contiguous).
+3. Important: Diagonal Filling of the matrix
+
+```python
+def longestPalindrome(self, s: str) -> str:
+n= len(s)
+dp = [[False]*n for _ in range(n)]
+
+for i in range(n):
+    dp[i][i] = True
+ans = [0,0]
+
+for i in range(n - 1):
+    if s[i] == s[i + 1]:
+        dp[i][i + 1] = True
+        ans = [i, i + 1]
+
+for i in range(n-1, -1, -1):
+    for j in range(n-1, -1, -1):
+        if j<=i+1:
+            continue
+        if s[i]==s[j] and dp[i+1][j-1]:
+            dp[i][j] = True
+            if j-i>ans[1]-ans[0]:
+                ans = [i,j]
+return s[ans[0]:ans[1]+1]
+```
+
+## Maximum Sum/Product Subarrays
+
+```python
+def max_subarray_sum(nums):
+    max_sum = nums[0]
+    current_sum = nums[0]
+    
+    for i in range(1, len(nums)):
+        current_sum = max(nums[i], current_sum + nums[i])
+        max_sum = max(max_sum, current_sum)
+    
+    return max_sum
+
+def maxProduct(nums):
+        prev_max, prev_min = nums[0], nums[0]
+        ans=prev_max
+        for i in range(1,len(nums)):
+            curr_max = max(nums[i], nums[i]*prev_max, nums[i]*prev_min)
+            curr_min = min(nums[i], nums[i]*prev_max, nums[i]*prev_min)
+            prev_max, prev_min = curr_max, curr_min
+            ans = max(ans, prev_max)
+        return ans
+```
+
+# Word Break
+
+```python
+#O(n^2), dp[i] represents if word till i can be broken into parts. Important problem as you need to check all previous indices. 
+```
+
+# Longest Increasing Subsequence
+
+1. The **Longest Increasing Subsequence (LIS) Pattern** is a common dynamic programming pattern used to find subsequences within a sequence that meet certain increasing criteria. This pattern typically involves identifying or counting **subsequences** (not necessarily contiguous) that satisfy conditions related to increasing order, longest length, or specific values.
+2. **Define the DP Array**: Use an array `dp` where `dp[i]` represents the length of the longest increasing subsequence ending at index `i`.
+3. **Transition**: For each element `i`, check all previous elements `j < i`. If `nums[j] < nums[i]`, update `dp[i] = max(dp[i], dp[j] + 1)` to extend the subsequence ending at `j`.
+4. **Important**: O(nlogn) Use `tails` to store the smallest ending of increasing subsequences. For each `num`, use binary search to find its position in `tails` – replace if within bounds, or append if beyond (is the last element)
+
+```python
+def length_of_lis(nums):
+    
+    dp = [1] * len(nums)  # Each element is at least an increasing subsequence of length 1
+    
+    for i in range(1, len(nums)):
+        for j in range(i):
+            if nums[j] < nums[i]:
+                dp[i] = max(dp[i], dp[j] + 1)
+    
+    return max(dp)
+```
+
+## Counting Paths/Combinations Pattern
+
+1. **Goal**: Given a target, find distinct ways to reach it based on given moves/rules.
+2. **DP Array/Table**: Use `dp[i]` or `dp[i][j]` to store the count of ways to reach each target or cell.
+3. **Common Formula**: For each `i`, update `dp[i]` by summing counts from preceding states based on allowed moves.
+
+#### Key Examples
+
+1. **Climbing Stairs**: `dp[i] = dp[i-1] + dp[i-2]`
+2. **Coin Change (Combinations)**: `dp[i] += dp[i - coin]` for each coin
+3. **Grid Unique Paths**: `dp[i][j] = dp[i-1][j] + dp[i][j-1]`
+
+## Longest Common Subsequence (LCS) Pattern
+
+1. **Goal**: Compare two sequences and find:
+   - Length of Longest Common Subsequence (LCS).
+   - Minimum edits to transform one sequence into another (Edit Distance).
+   - Longest contiguous substring (Longest Common Substring).
+2. **Key Idea**: Use a 2D DP table `dp[i][j]` where:
+   - `dp[i][j]` represents the result for substrings `s1[:i]` and `s2[:j]`.
+3. **Base Cases**: If `i == 0` or `j == 0`, the result is `0` (empty string).
+
+```python
+def longest_common_subsequence(text1, text2):
+    m, n = len(text1), len(text2)
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if text1[i - 1] == text2[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            else:
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+
+    return dp[m][n]
+```
+
+### Variants
+
+1. **Edit Distance**: Modify `dp[i][j]` transition to consider insert, delete, substitute. Also modify to correct base case. 
+
+   ```python
+   dp[i][j] = min(dp[i-1][j]+1, dp[i][j-1]+1, dp[i-1][j-1]+(1 if s1[i-1]!=s2[j-1] else 0))
+   ```
+2. **Longest Common Substring**: If characters match, add `+1` to previous diagonal:
+
+   ```python
+   if text1[i - 1] == text2[j - 1]: dp[i][j] = dp[i - 1][j - 1] + 1 else: dp[i][j] = 0
+   ```
+
+## State based DP Pattern
+
+1. **Goal**: Optimize decisions across states influenced by actions (e.g., buying/selling, resting/working).
+2. **Key Idea**: Define **states** to track situations (e.g., holding stock, not holding, cooldown) and **transition equations** between states.
+3. **Steps**:
+   - Identify **states** based on possible actions.
+   - Draw a **state diagram** to visualize transitions.
+   - Write **recurrence relations** for each state based on dependencies.
+4. **Base Cases**: Define initial conditions (e.g., starting with no stock or zero profit).
+
+```python
+def state_based_dp_problem(prices):
+    # Base cases (initial states)
+    hold = -prices[0]   # Max profit when holding stock on day 0
+    not_hold = 0        # Max profit when not holding stock on day 0
+    cooldown = 0        # Max profit in cooldown on day 0
+
+    for i in range(1, len(prices)):
+        prev_hold = hold
+        # State transitions
+        hold = max(hold, not_hold - prices[i])        # Continue holding or buy today
+        not_hold = max(not_hold, cooldown)           # Continue not holding or end cooldown
+        cooldown = prev_hold + prices[i]             # Sell today and enter cooldown
+
+    # Final result: max profit can be in not_hold or cooldown
+    return max(not_hold, cooldown)
+```
