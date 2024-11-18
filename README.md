@@ -743,7 +743,7 @@ def dijkstra(graph, start):
 1. To detect length of cycle or elements in cycle, you can keep track of entry times in the recursive_stack. This can also help you in finding the exact cycle. 
 2. For **undirected graphs**, cycles are found using DSU or DFS with back edges. For **directed graphs**, cycles are detected through **DFS with recursion stack tracking**.
 
-## Dynamic Programming
+# Dynamic Programming
 
 1. General tip - In bottom up DP, if 2D DP, draw the matrix and visualize the dependencies, becomes easier.
 2. Sometime memoization is more intuitive, sometime DP is more intuitive. DP you can usually perform space optimization. 
@@ -857,13 +857,13 @@ def maxProduct(nums):
         return ans
 ```
 
-# Word Break
+## Word Break
 
 ```python
 #O(n^2), dp[i] represents if word till i can be broken into parts. Important problem as you need to check all previous indices. 
 ```
 
-# Longest Increasing Subsequence
+## Longest Increasing Subsequence
 
 1. The **Longest Increasing Subsequence (LIS) Pattern** is a common dynamic programming pattern used to find subsequences within a sequence that meet certain increasing criteria. This pattern typically involves identifying or counting **subsequences** (not necessarily contiguous) that satisfy conditions related to increasing order, longest length, or specific values.
 2. **Define the DP Array**: Use an array `dp` where `dp[i]` represents the length of the longest increasing subsequence ending at index `i`.
@@ -959,4 +959,54 @@ def state_based_dp_problem(prices):
 
     # Final result: max profit can be in not_hold or cooldown
     return max(not_hold, cooldown)
+```
+
+## Todo
+
+1. Negative marking 
+2. Prefix Sum + Hashmap pattern (also modulo if involved)
+3. Sliding window + Hashmap (also using matched variable to avoid hashmap)
+4. Monotonic Stack
+5. QuickSelect Algorithm 
+
+# Arrays + Hashmaps
+
+## QuickSelect 
+
+- **Use Cases**:
+  - **Kth largest/smallest element** or **Top K elements** in O(n) average time.
+  - Avoids full sorting for subset problems (better than nlogn).
+- **Key Insight**:
+  - Partition around a **pivot** to partially sort: left satisfies the comparator, pivot lands in its correct position.
+- **How to Use**:
+  - Set `k = k - 1` for 0-based indexing.
+  - Use `x >= y` for **descending order** (Kth largest, Top K).
+  - Use `x <= y` for **ascending order** (Kth smallest, Bottom K).
+
+```python
+def quickselect(arr, left, right, k, comparator):
+    def partition(arr, left, right):
+        pivot = arr[right]  # Choose the last element as pivot
+        p = left  # Pointer for elements satisfying comparator
+        for i in range(left, right):
+            if comparator(arr[i], arr[right]):  # Compare with pivot
+                arr[i], arr[p] = arr[p], arr[i]
+                p += 1
+        arr[p], arr[right] = arr[right], arr[p]  # Place pivot in position
+        return p
+
+    if left <= right:
+        pivot_index = partition(arr, left, right)
+        if pivot_index == k:  # Found the Kth element
+            return arr[pivot_index]
+        elif pivot_index < k:  # Look for Kth in the right part
+            return quickselect(arr, pivot_index + 1, right, k, comparator)
+        else:  # Look for Kth in the left part
+            return quickselect(arr, left, pivot_index - 1, k, comparator)
+
+# Comparator for kth largest and top k elements 
+comparator = lambda x, y: x >= y
+
+# Comparator for kth smallest and bottom k elements 
+comparator = lambda x, y: x <= y
 ```
