@@ -1,3 +1,7 @@
+**RoadMap**
+
+Classes - Methods, Attributed, Class Variables, Class Methods 2) OOPS concepts - Abstraction, Polymorphism, Encapsulation, Inheritance 3) super() method 4) Design Principles - SOLID, DRY, KISS, YAGNI 5) Design Patterns - Only important ones - Singleton, Factory Method, Builder, Strategy, Observer 6) Importants concepts/classes to know - Unique ID generation, Desgining Rate Limiter (Token bucket, fixed window), Caching (LRU, LFU), Queue management (Asynchronous Processing of Tasks, Desiognning notifications Systems using message queue/observer patterns), time based schedulers like crons jobs, load balancing algorithms, Data Paginiation and limtiing results, Search and Fileting, Acces contro and permissions, Handling concurrency and synchronization, **File system organization (Searching)**
+
 ## Classes and Methods
 
 ### **Class Definition and Initialization**

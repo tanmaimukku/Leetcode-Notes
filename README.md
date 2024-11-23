@@ -1,3 +1,7 @@
+# Contents
+
+Backtracking
+
 # Backtracking
 
 1. Always sketch out the recursion tree in backtracking problems, solving becomes easy from there
@@ -968,20 +972,22 @@ def state_based_dp_problem(prices):
 3. Sliding window + Hashmap (also using matched variable to avoid hashmap)
 4. Monotonic Stack
 5. QuickSelect Algorithm 
+6. Storing index as key in hashmap (Problem #3 leetcode)
+7. Sliding window - complement of sliding window pattern [**2516. Take K of Each Character From Left and Right**](https://leetcode.com/problems/take-k-of-each-character-from-left-and-right/)
 
 # Arrays + Hashmaps
 
 ## QuickSelect 
 
-- **Use Cases**:
-  - **Kth largest/smallest element** or **Top K elements** in O(n) average time.
-  - Avoids full sorting for subset problems (better than nlogn).
-- **Key Insight**:
-  - Partition around a **pivot** to partially sort: left satisfies the comparator, pivot lands in its correct position.
-- **How to Use**:
-  - Set `k = k - 1` for 0-based indexing.
-  - Use `x >= y` for **descending order** (Kth largest, Top K).
-  - Use `x <= y` for **ascending order** (Kth smallest, Bottom K).
+1. **Use Cases**:
+   - **Kth largest/smallest element** or **Top K elements** in O(n) average time.
+   - Avoids full sorting for subset problems (better than nlogn).
+2. **Key Insight**:
+   - Partition around a **pivot** to partially sort: left satisfies the comparator, pivot lands in its correct position.
+3. **How to Use**:
+   - Set `k = k - 1` for 0-based indexing.
+   - Use `x >= y` for **descending order** (Kth largest, Top K).
+   - Use `x <= y` for **ascending order** (Kth smallest, Bottom K).
 
 ```python
 def quickselect(arr, left, right, k, comparator):
@@ -1010,3 +1016,243 @@ comparator = lambda x, y: x >= y
 # Comparator for kth smallest and bottom k elements 
 comparator = lambda x, y: x <= y
 ```
+
+## Prefix Sum (Prefix Sum, Prefix Sum+Binary Search, Prefix Sum+Hashmaps)
+
+1. **Key Idea**: Combine prefix sums with a hashmap to store cumulative sums and solve subarray problems dynamically.
+2. `prefix[i] - prefix[j] = k => prefix[j] = prefix[i] - k`
+3. **Use Cases**:
+   - Count subarrays with specific conditions (e.g., sum equals k).
+   - Modular conditions (e.g., divisible by k).
+4. Important points: **Particularly useful when sliding window approaches fail (because of presence of negative numbers), If only +ve numbers are present, prefix_sum array is sorted, can think if binary search is needed.**
+
+```python
+def prefix_sum_with_hashmap(arr, k):
+    prefix = 0
+    count = 0
+    hashmap = {0: 1}  # Initialize with prefix 0 to handle exact matches
+    
+    for num in arr:
+        prefix += num
+        # Check if prefix - k exists in the hashmap
+        if (prefix - k) in hashmap:
+            count += hashmap[prefix - k]
+        # Update the hashmap with the current prefix
+        hashmap[prefix] = hashmap.get(prefix, 0) + 1
+    
+    return count
+```
+
+## Hashsets (Building consecutive sequences pattern)
+
+#### **Key Idea**:
+
+1. Use a `HashSet` for:
+   - Quick lookups for presence/absence.
+   - Ensuring uniqueness of elements.
+   - Problems involving element relationships (e.g., consecutive sequences).
+
+```python
+def longest_consecutive(nums):
+  
+    num_set = set(nums)
+    longest = 0
+    
+    for num in num_set:
+        # Check if it's the start of a sequence
+        if num - 1 not in num_set:
+            length = 0
+            current = num
+            while current in num_set:
+                length += 1
+                current += 1
+            longest = max(longest, length)
+    
+    return longest
+```
+
+## Sorting
+
+```python
+# 1. Sort in Ascending Order
+arr.sort()  # [1, 3, 5, 8]
+
+# 2. Sort in Descending Order
+arr.sort(reverse=True)  # [8, 5, 3, 1]
+
+# 3. Sort by the Second Element in a Tuple
+arr.sort(key=lambda x: x[1])  # [(3, 1), (1, 2), (2, 3)]
+
+# 4. Sort by Length of Strings
+arr.sort(key=lambda x: len(x))  # ['kiwi', 'apple', 'banana']
+
+# 5. Sort by Multiple Keys (Primary Ascending, Secondary Descending)
+arr.sort(key=lambda x: (x[0], -x[1]))  # [(1, 3), (1, 2), (2, 3), (2, 2)]
+
+# 6. Sort by the second element in a tuple using sorted()
+sorted_arr = sorted(arr, key=lambda x: x[1])  # [(3, 1), (1, 2), (2, 3)]
+```
+
+## Negative Marking
+
+1. The problem involves integers bounded by the size of the array (e.g., values from 1 to n). 
+2. You’re asked to find duplicates, missing elements, or cycles in O(n) time and O(1) space. 
+3. The input array can be modified in-place.
+
+```python
+def find_duplicates(nums): #nums has only values 1 to n
+    res = []
+    for num in nums:
+        index = abs(num) - 1  # Map value to index
+        if nums[index] < 0:
+            res.append(abs(num))  # Already marked negative -> duplicate
+        else:
+            nums[index] = -nums[index]  # Mark as visited
+    return res
+```
+
+## Majority Element (Boyer-Moore Voting Algorithm + Hashmap Alternative)
+
+1. Candidate votes for itself, all other candidates vote against it
+
+```python
+def majority_element(nums):
+   
+    # Step 1: Find the candidate
+    candidate, count = None, 0
+    for num in nums:
+        if count == 0:
+            candidate = num
+        count += 1 if num == candidate else -1
+```
+
+# 2 pointers
+
+## Opposite Direction Two Pointers
+
+Sorting may be useful if not explicitly prohibited
+
+In the **Opposite Direction Two Pointers** pattern, two pointers are initialized at opposite ends of a list or array, and they are moved toward each other based on conditions to solve a problem. This approach is widely applicable to problems involving sorted arrays, searching for optimal solutions, or evaluating complex conditions involving multiple indices.
+
+Use `l < r`: For problems comparing pairs of elements where overlapping isn't meaningful (most problems, 2 sum sorted etc). Use `l <= r`: For problems where overlapping or single element checks are necessary (palindrome check). 
+
+```python
+def opposite_direction_two_pointers(arr, condition):
+    left, right = 0, len(arr) - 1
+    
+    while left < right:
+        # Perform actions based on condition
+        if condition(arr[left], arr[right]):
+            # Example: process a valid pair
+            process(arr[left], arr[right])
+        
+        # Update pointers based on the problem logic
+        if move_left_condition:  # Replace with actual condition
+            left += 1
+        elif move_right_condition:  # Replace with actual condition
+            right -= 1
+        else:
+            # Break if no further action is possible
+            break
+```
+
+#### **General Problem Categories**
+
+1. **Simple Conditions**:
+
+   - Problems with straightforward conditions for moving pointers (e.g., sums, comparisons, or matching characters).
+   - **Examples**:
+     - Two-Sum in a sorted array.
+     - Checking if a string is a palindrome.
+
+2. **Complex Conditions**:
+
+   - Problems where the condition to move pointers involves more elaborate calculations or logic.
+   - **Examples**:
+     - Maximizing or minimizing values (e.g., Container with Most Water).
+     - Aggregating values across the pointers (e.g., Trapping Rain Water).
+
+3. **Advanced Applications**:
+
+   - Problems that incorporate sorting or nested loops (e.g., counting triplets or evaluating multiple conditions)
+   - **Examples:**
+     - Valid triangle number, 3-sum
+     - Note: Was not able to solve 3-sum (**including all duplicates**) using this method
+
+```python
+def opposite_direction_with_sorting(arr):
+    # Step 1: Sort the array if needed
+    arr.sort()
+
+    # Step 2: Iterate through the array with one fixed pointer
+    for i in range(len(arr)):
+        left, right = i + 1, len(arr) - 1 #Can be adjusted, you can start at end of array too, like Valid triangle
+        
+        # Step 3: Use two pointers to evaluate the condition
+        while left < right:
+            if condition(arr[i], arr[left], arr[right]): 
+                process(arr[i], arr[left], arr[right])
+                # Adjust pointers based on requirements
+                left += 1
+                right -= 1
+            elif adjust_left_condition:  # Example condition to move left
+                left += 1
+            else:  # Adjust right
+                right -= 1
+```
+
+## Same Direction Pointers (Not Sliding Window)
+
+This pattern involves two pointers (`left` and `right`) that move in the same direction. The **right pointer** moves first until a condition is met or unmet. Once the condition changes, the **left pointer** is adjusted to the position of the right pointer. This is **not a sliding window** since the left pointer does not increment gradually but instead jumps to match the right pointer.
+
+#### **Key Insights**
+
+1. **Right Pointer Moves First**:
+
+   - Start with `left` and `right` at the same position.
+   - Increment `right` while evaluating a condition.
+
+2. **Adjust Left Pointer**:
+
+   - When the condition is violated or met, bring the `left` pointer to match the `right` pointer.
+
+3. **Non-Overlapping Subarrays**:
+
+   - This pattern ensures that the ranges between `left` and `right` pointers are disjoint or non-overlapping.
+
+```python
+def same_direction_pointers(arr):
+    left = 0
+    right = 0
+    while right < len(arr):
+        # Expand the right pointer
+        while right < len(arr) and condition(arr[right]):
+            #Can have complex logic here instead of having condition above
+            right += 1
+        
+        # Process the range [left, right)
+        process(arr[left:right])
+        
+        # Increment right pointer by 1 to start new window
+        right+=1
+        # Move the left pointer to match the right
+        left = right
+```
+
+#### **Common Applications**
+
+1. **Splitting Strings or Arrays**:
+
+   - Breaking a sequence into segments based on a condition.
+
+2. **Processing Subarrays**:
+
+   - Analyze non-overlapping subarrays meeting specific criteria.
+
+3. **Counting or Extracting Ranges**:
+
+   - Count segments, extract substrings, or find subarrays.
+
+4. **Skipping Invalid Values**:
+
+   - Handle sequences with gaps or delimiters by skipping invalid parts.
