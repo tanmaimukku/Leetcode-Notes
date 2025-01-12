@@ -1256,3 +1256,140 @@ def same_direction_pointers(arr):
 4. **Skipping Invalid Values**:
 
    - Handle sequences with gaps or delimiters by skipping invalid parts.
+
+## Three pointers
+
+Basically partition array into three groups by some conditions.
+
+```python
+def sort_colors(nums):
+    p1, p2, p3 = 0, 0, len(nums) - 1
+
+    while p2 <= p3:
+        if nums[p2] == 0:  # Move 0s to the left
+            nums[p1], nums[p2] = nums[p2], nums[p1]
+            p1 += 1
+            p2 += 1
+        elif nums[p2] == 1:  # Keep 1s in the middle
+            p2 += 1
+        else:  # Move 2s to the right
+            nums[p2], nums[p3] = nums[p3], nums[p2]
+            p3 -= 1
+```
+
+## Pattern: Two Pointers on Two Different Arrays/Strings
+
+This pattern involves using two pointers, each operating on a separate array or string. The pointers traverse independently or interact based on specific conditions to solve a problem efficiently.
+
+```python
+def two_pointers_on_two_arrays(arr1, arr2):
+    # Initialize two pointers
+    i, j = 0, 0
+    result = []
+
+    while i < len(arr1) and j < len(arr2):
+        if condition(arr1[i], arr2[j]):
+            process(arr1[i], arr2[j], result)
+            i += 1
+            j += 1
+        elif adjust_pointer_1_condition:
+            i += 1
+        else:
+            j += 1
+
+    # Process remaining elements if required
+    while i < len(arr1):
+        process(arr1[i], None, result)
+        i += 1
+    while j < len(arr2):
+        process(None, arr2[j], result)
+        j += 1
+
+    return result
+```
+
+## Pattern: Fast and Slow Pointers on Arrays (Tortoise and Hare) 
+
+Just writing it down here, not very important, revisit if you have time. 2 problems - LeetCode 457: Circular Array Loop, LeetCode 202: Happy Number
+
+# Sliding Window
+
+## Fixed Size
+
+```python
+def fixed_size_sliding_window(arr, k):
+    n = len(arr)
+    window_sum = 0
+    result = []
+
+    # Initialize the first window
+    for i in range(k):
+        window_sum += arr[i]
+    
+    # Append the result of the first window
+    result.append(window_sum)
+
+    # Slide the window across the array
+    for i in range(k, n):
+        window_sum += arr[i] - arr[i - k]  # Add the next element, remove the first element of the previous window
+        result.append(window_sum)
+    
+    return result
+```
+
+## Dynamic Size
+
+```python
+l = 0
+for r in range(len(nums)):
+    # Expand window by adding nums[r]
+    update_window(nums[r])
+
+    # Shrink window if condition is violated
+    while condition_not_met():
+        # Update result if required inside the loop (e.g., for min problems)
+        update_window_on_shrink(nums[l])
+        l += 1
+
+    # Update result if required outside the loop (e.g., for max problems)
+    update_result(l, r)
+```
+
+### **Dynamic Sliding Window Notes**
+
+1. **General Rules**:
+
+   - Use two pointers (`l`, `r`): expand with `r`, shrink with `l`.
+   - **Update result inside** `while` if intermediate windows matter (e.g., **min problems**).
+   - **Update result after** `while` if only the final window matters (e.g., **max problems**).
+
+2. **Sliding Window + HashMap/Set**:
+
+   - Use a hashmap/set to track element frequencies or uniqueness.
+   - Shrink when the hashmap/set exceeds constraints (e.g., distinct elements &gt; `k`).
+
+3. **Index Trick (Last Occurrence)**:
+
+   - Use a hashmap to store the last occurrence of an element.
+   - Update `l` to `max(l, last_occurrence + 1)` to skip invalid windows.
+
+4. **Matches Trick (Two HashMaps)**:
+
+   - Use two hashmaps and a `matches` variable to track when the window satisfies the target hashmap.
+   - Increment `matches` when counts match; decrement on invalid shrink.
+
+5. **Sliding Window + Prefix Sum**:
+
+   - Use prefix sums to compute subarray sums efficiently.
+   - Track prefix sums in a hashmap for difference-based lookups.
+
+6. **Sliding Window + Deque**:
+
+   - Use a deque to maintain a monotonic order of indices/values in the window.
+   - Useful for problems like finding max/min in a sliding window.
+
+7. **Quirks and Edge Cases**:
+
+   - For substring problems, slicing (`s[l:r+1]`) is useful.
+   - Sliding window can combine with binary search for length checks.
+   - Two-pass sliding window works when expansion and shrinking need separate logic.
