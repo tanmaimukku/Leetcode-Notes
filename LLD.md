@@ -1,8 +1,8 @@
 **RoadMap**
 
-Classes - Methods, Attributed, Class Variables, Class Methods 2) OOPS concepts - Abstraction, Polymorphism, Encapsulation, Inheritance 3) super() method 4) Design Principles - SOLID, DRY, KISS, YAGNI 5) Design Patterns - Only important ones - Singleton, Factory Method, Builder, Strategy, Observer 6) Importants concepts/classes to know - Unique ID generation, Desgining Rate Limiter (Token bucket, fixed window), Caching (LRU, LFU), Queue management (Asynchronous Processing of Tasks, Desiognning notifications Systems using message queue/observer patterns), time based schedulers like crons jobs, load balancing algorithms, Data Paginiation and limtiing results, Search and Fileting, Acces contro and permissions, Handling concurrency and synchronization, **File system organization (Searching)**
+Classes - Methods, Attributes, Class Variables, Class Methods 2) OOPS concepts - Abstraction, Polymorphism, Encapsulation, Inheritance 3) super() method 4) Design Principles - SOLID, DRY, KISS, YAGNI 5) Design Patterns - Only important ones - Singleton, Factory Method, Builder, Strategy, Observer 6) Importants concepts/classes to know - Unique ID generation, Desgining Rate Limiter (Token bucket, fixed window), Caching (LRU, LFU), Queue management (Asynchronous Processing of Tasks, Desiognning notifications Systems using message queue/observer patterns), time based schedulers like crons jobs, load balancing algorithms, Data Paginiation and limtiing results, Search and Fileting, Acces contro and permissions, Handling concurrency and synchronization, **File system organization (Searching), Parking Lot, Hotel management system, Amazon Pizza Question**
 
-## Classes and Methods
+# Classes and Methods
 
 ### **Class Definition and Initialization**
 
@@ -69,7 +69,7 @@ class MathUtils:
 print(MathUtils.add(5, 3))  # Output: 8
 ```
 
-## OOP Concepts
+# OOP Concepts
 
 ### **Inheritance**
 
@@ -191,4 +191,376 @@ child = Child()
 print(child.greet())  # Output: Hello from Child
 ```
 
-## Design Principles
+# Design Principles
+
+## SOLID Principles
+
+1. **Single Responsibility Principle (SRP)**:
+
+   - **Definition**: A class should have only one reason to change, meaning it should only have one job.
+
+   - **Example**:
+
+     ```python
+     class Invoice:
+         def __init__(self, items):
+             self.items = items
+     
+         def calculate_total(self):
+             return sum(self.items)
+     
+     class InvoicePrinter:
+         def print_invoice(self, invoice):
+             print(f"Invoice Total: {invoice.calculate_total()}")
+     ```
+
+     - **Why**: Separates the responsibilities of calculating and printing the invoice.
+
+2. **Open/Closed Principle (OCP)**:
+
+   - **Definition**: A class should be open for extension but closed for modification.
+
+   - **Example**:
+
+     ```python
+     class Discount:
+         def apply_discount(self, price):
+             return price
+     
+     class PercentageDiscount(Discount):
+         def __init__(self, percent):
+             self.percent = percent
+     
+         def apply_discount(self, price):
+             return price * (1 - self.percent / 100)
+     ```
+
+     - **Why**: New discount types can be added by extending the `Discount` class without modifying existing code.
+
+3. **Liskov Substitution Principle (LSP)**:
+
+   - **Definition**: Subtypes must be substitutable for their base types.
+
+   - **Example**:
+
+     ```python
+     class Bird:
+         def fly(self):
+             pass
+     
+     class Sparrow(Bird):
+         def fly(self):
+             print("Sparrow flying")
+     
+     def make_bird_fly(bird):
+         bird.fly()
+     
+     make_bird_fly(Sparrow())  # Works correctly
+     ```
+
+     - **Why**: Subclasses like `Sparrow` can replace `Bird` without breaking functionality.
+
+4. **Interface Segregation Principle (ISP)**:
+
+   - **Definition**: A class should not be forced to implement interfaces it does not use.
+
+   - **Example**:
+
+     ```python
+     class Printer:
+         def print(self):
+             pass
+     
+     class Scanner:
+         def scan(self):
+             pass
+     
+     class AllInOneMachine(Printer, Scanner):
+         def print(self):
+             print("Printing...")
+     
+         def scan(self):
+             print("Scanning...")
+     ```
+
+     - **Why**: The interfaces are split into `Printer` and `Scanner`, so classes only implement what they need.
+
+5. **Dependency Inversion Principle (DIP)**:
+
+   - **Definition**: High-level modules should not depend on low-level modules. Both should depend on abstractions.
+
+   - **Example**:
+
+     ```python
+     class Database:
+         def save(self, data):
+             pass
+     
+     class MySQLDatabase(Database):
+         def save(self, data):
+             print("Saving data to MySQL")
+     
+     class Application:
+         def __init__(self, database: Database):
+             self.database = database
+     
+         def store_data(self, data):
+             self.database.save(data)
+     
+     app = Application(MySQLDatabase())
+     app.store_data("Sample data")
+     ```
+
+     - **Why**: The `Application` class depends on the abstraction `Database`, not on the concrete implementation.
+
+## DRY (Don’t Repeat Yourself)
+
+- **Definition**: Avoid duplicating code by abstracting common functionality.
+
+- **Example**:
+
+  ```python
+  def calculate_area(length, width):
+      return length * width
+  
+  class Rectangle:
+      def __init__(self, length, width):
+          self.length = length
+          self.width = width
+  
+      def area(self):
+          return calculate_area(self.length, self.width)
+  ```
+
+## KISS (Keep It Simple, Stupid)
+
+- **Definition**: Keep designs simple and avoid unnecessary complexity.
+
+- **Example**:
+
+  ```python
+  def add(a, b):
+      return a + b
+  ```
+
+  - Avoid overengineering a simple addition function.
+
+## YAGNI (You Aren’t Gonna Need It)
+
+- **Definition**: Don’t implement functionality until it’s actually required.
+
+- **Example**:
+
+  ```python
+  class Feature:
+      def useful_function(self):
+          print("This is useful now.")
+  ```
+
+  - Avoid adding speculative methods or features "just in case" they are needed later.
+
+# DESIGN PATTERNS (Only Important Ones)
+
+## 1. Singleton Pattern
+
+- **Purpose**: Ensures that a class has only one instance and provides a global access point to it.
+- **Key Use Cases**: Configuration managers, database connections, logging systems.
+
+```python
+class Singleton:
+    _instance = None
+
+    def __new__(cls):
+        if not cls._instance:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+# Usage
+s1 = Singleton()
+s2 = Singleton()
+print(s1 is s2)  # True
+```
+
+## 2. Factory Method Pattern
+
+- **Purpose**: Creates objects without specifying the exact class. Lets subclasses decide which class to instantiate.
+- **Key Use Cases**: When a method must return objects of different types based on conditions.
+
+```python
+from abc import ABC, abstractmethod
+
+class Notification(ABC):
+    @abstractmethod
+    def send(self, message):
+        pass
+
+class EmailNotification(Notification):
+    def notify(self):
+        print("Sending Email Notification")
+
+class SMSNotification(Notification):
+    def notify(self):
+        print("Sending SMS Notification")
+
+class NotificationFactory:
+    @staticmethod
+    def create_notification(type_):
+        if type_ == "email":
+            return EmailNotification()
+        elif type_ == "sms":
+            return SMSNotification()
+        else:
+            raise ValueError("Invalid notification type")
+
+# Usage
+factory = NotificationFactory()
+notification = factory.create_notification("email")
+notification.notify()  # Output: Sending Email Notification
+```
+
+## 3. Builder Pattern
+
+- **Purpose**: Constructs complex objects step by step, separating construction logic from the representation.
+- **Key Use Cases**: Building objects with multiple optional parameters.
+
+```python
+class House:
+    def __init__(self):
+        self.rooms = 0
+        self.garage = False
+        self.swimming_pool = False
+
+    def __str__(self):
+        return f"House with {self.rooms} rooms, Garage: {self.garage}, Pool: {self.swimming_pool}"
+
+class HouseBuilder:
+    def __init__(self):
+        self.house = House()
+
+    def set_rooms(self, rooms):
+        self.house.rooms = rooms
+        return self
+
+    def add_garage(self):
+        self.house.garage = True
+        return self
+
+    def add_pool(self):
+        self.house.swimming_pool = True
+        return self
+
+    def build(self):
+        return self.house
+
+# Usage
+builder = HouseBuilder()
+luxury_house = builder.set_rooms(4).add_garage().add_pool().build()
+print(luxury_house)  # Output: House with 4 rooms, Garage: True, Pool: True
+```
+
+## 4. Strategy Pattern
+
+- **Purpose**: Defines a family of algorithms, encapsulates each one, and makes them interchangeable at runtime.
+- **Key Use Cases**: Dynamic algorithm selection, e.g., different payment methods.
+
+```python
+from abc import ABC, abstractmethod
+
+class PaymentStrategy(ABC):
+    @abstractmethod
+    def pay(self, amount):
+        pass
+
+class CreditCardPayment(PaymentStrategy):
+    def __init__(self, card_number, card_expiry):
+        self.card_number = card_number
+        self.card_expiry = card_expiry
+
+    def pay(self, amount):
+        print(f"Paying ${amount} using Credit Card ending in {self.card_number[-4:]}")
+
+class PayPalPayment(PaymentStrategy):
+    def __init__(self, email):
+        self.email = email
+
+    def pay(self, amount):
+        print(f"Paying ${amount} using PayPal account {self.email}")
+
+class BitcoinPayment(PaymentStrategy):
+    def __init__(self, wallet_address):
+        self.wallet_address = wallet_address
+
+    def pay(self, amount):
+        print(f"Paying ${amount} using Bitcoin wallet {self.wallet_address}")
+
+class ShoppingCart:
+    def __init__(self):
+        self.items = []
+        self.total_amount = 0
+
+    def add_item(self, item, price):
+        self.items.append(item)
+        self.total_amount += price
+
+    def pay(self, payment_strategy: PaymentStrategy):
+        payment_strategy.pay(self.total_amount)
+
+# Create a shopping cart
+cart = ShoppingCart()
+cart.add_item("Book", 15)
+cart.add_item("Pen", 5)
+
+# Pay using different strategies
+cart.pay(CreditCardPayment("1234-5678-9012-3456", "12/23"))
+cart.pay(PayPalPayment("user@example.com"))
+cart.pay(BitcoinPayment("1A2b3C4d5E6f7G8h9I0J"))
+```
+
+## 5. Observer Pattern
+
+- **Purpose**: Defines a one-to-many dependency where multiple observers are notified of changes in the subject’s state.
+- **Key Use Cases**: Event-driven systems, like GUIs or notifications.
+
+```python
+class Subject:
+    def __init__(self):
+        self._observers = []
+
+    def add_observer(self, observer):
+        self._observers.append(observer)
+
+    def remove_observer(self, observer):
+        self._observers.remove(observer)
+
+    def notify_observers(self, data):
+        for observer in self._observers:
+            observer.update(data)
+
+from abc import ABC, abstractmethod
+
+class Observer:
+    @abstractmethod
+    def update(self, data):
+        pass
+
+class EmailObserver(Observer):
+    def update(self, data):
+        print(f"Email Observer: Received data - {data}")
+
+class SMSObserver(Observer):
+    def update(self, data):
+        print(f"SMS Observer: Received data - {data}")
+
+# Usage
+subject = Subject()
+email_observer = EmailObserver()
+sms_observer = SMSObserver()
+
+subject.add_observer(email_observer)
+subject.add_observer(sms_observer)
+
+subject.notify_observers("System Update Available!")
+# Output:
+# Email Observer: Received data - System Update Available!
+# SMS Observer: Received data - System Update Available!
+```
