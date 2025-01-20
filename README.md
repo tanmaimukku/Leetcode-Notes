@@ -1381,15 +1381,709 @@ for r in range(len(nums)):
 5. **Sliding Window + Prefix Sum**:
 
    - Use prefix sums to compute subarray sums efficiently.
-   - Track prefix sums in a hashmap for difference-based lookups.
+   - Track prefix sums in a hashmap for difference-based lookups. 
 
 6. **Sliding Window + Deque**:
 
    - Use a deque to maintain a monotonic order of indices/values in the window.
-   - Useful for problems like finding max/min in a sliding window.
+   - Useful for problems like finding max/min in a sliding window. (Covered in detail in queues section)
 
-7. **Quirks and Edge Cases**:
+7. **Complement of Sliding Window**
+
+   - The answer lies outside the window (example select minimum/maximum something from left and right) problem [**<u>2516. Take K of Each Character From Left and Right</u>**](https://leetcode.com/problems/take-k-of-each-character-from-left-and-right/)
+
+8. **Quirks and Edge Cases**:
 
    - For substring problems, slicing (`s[l:r+1]`) is useful.
-   - Sliding window can combine with binary search for length checks.
+   - Sliding window can combine with binary search for length checks. 
    - Two-pass sliding window works when expansion and shrinking need separate logic.
+
+# Stacks
+
+## Stack Simulation Pattern
+
+#### 1. **Direct Stack Usage** 
+
+- **Use Case**: Maintain elements or operations in a stack to process them in LIFO order.
+- **Key Steps**:
+  1. Push elements onto the stack as needed.
+  2. Pop elements off the stack to resolve conditions or complete operations.
+- Example problems - Valid Paranthesis, 
+
+```python
+stack = []
+for char in input_sequence:
+    if condition_to_push(char):
+        stack.append(char)
+    elif condition_to_pop(stack, char):
+        stack.pop()
+return result_based_on_stack(stack)
+```
+
+#### 2. **Auxiliary Stack for Tracking**
+
+- **Use Case**: Use a secondary stack to track auxiliary information (e.g., **min/max**, **wildcards**).
+- **Key Steps**:
+  1. Use the main stack for primary operations.
+  2. Use the auxiliary stack to maintain additional data in sync.
+  3. Synchronize both stacks during push and pop operations.
+
+```python
+stack, aux_stack = [], []
+for char in input_sequence:
+    if condition_to_push(char):
+        stack.append(char)
+        aux_stack.append(update_aux(char, aux_stack))
+    elif condition_to_pop(stack, char):
+        stack.pop()
+        aux_stack.pop()
+return result_based_on_aux(aux_stack)
+```
+
+## Monotonic Stack
+
+#### Overview:
+
+- **Definition**: A stack that maintains elements in a strictly increasing or decreasing order (monotonic).
+- **Use Case**: Solve problems involving nearest greater/smaller elements, range computations, and areas/volumes efficiently.
+- **Key Ideas**:
+  - Push elements while maintaining the order.
+  - Pop elements when the order is violated, typically while processing conditions.
+
+#### **Two Types of Monotonic Stacks**:
+
+#### 1. **Monotonically Increasing Stack**
+
+- **Maintains elements in increasing order**.
+- **Usage**: "Next Smaller Element" or "Nearest Smaller Element" problems. (Largest Rectangle in Histogram)
+
+```python
+def monotonically_increasing_stack(array):
+    stack = []
+    result = [-1] * len(array)  # Result to store required output (e.g., next smaller/greater)
+
+    for i, val in enumerate(array):
+        while stack and array[stack[-1]] > val:
+            index = stack.pop()
+            result[index] = val  # Process the popped element (e.g., update result)
+        stack.append(i)  # Push the current index onto the stack
+
+    return result
+```
+
+#### 2. **Monotonically Decreasing Stack**
+
+- **Maintains elements in decreasing order**.
+- **Usage**: "Next Greater Element" or "Nearest Greater Element" problems. (Trapping Rain Water)
+
+```python
+def monotonically_decreasing_stack(array):
+    stack = []
+    result = [-1] * len(array)  # Result to store required output (e.g., next smaller/greater)
+
+    for i, val in enumerate(array):
+        while stack and array[stack[-1]] < val:
+            index = stack.pop()
+            result[index] = val  # Process the popped element (e.g., update result)
+        stack.append(i)  # Push the current index onto the stack
+
+    return result
+```
+
+# Queue
+
+## Monotonic Queue (decreasing example, for sliding window maximum)
+
+**Key Idea**:
+
+- Remove elements from the front of the queue if they are not part of the current window
+- Remove elements from the back of the queue that are smaller than the current element to maintain the order.
+
+```python
+from collections import deque
+
+def monotonic_decreasing_queue(nums, k):
+    queue = deque()
+    result = []
+
+    for i, num in enumerate(nums):
+        # Remove indices out of the current sliding window
+        if queue and queue[0] < i - k + 1:
+            queue.popleft()
+
+        # Remove elements smaller than the current element from the back
+        while queue and nums[queue[-1]] < num:
+            queue.pop()
+
+        queue.append(i)  # Add current index to the queue
+
+        # Add the maximum for the current window to the result
+        if i >= k - 1:
+            result.append(nums[queue[0]])
+
+    return result
+```
+
+# Binary Search
+
+```python
+def binary_search_variant(arr, target):
+    left, right = 0, len(arr) - 1
+    result = -1  # Initialize result if needed
+    while left <= right:
+        mid = left + (right - left) // 2
+        if arr[mid] ? target:  # Replace '?' with the appropriate operator
+            result = mid  # Update result if needed
+            # Decide whether to move left or right based on the pattern
+            right = mid - 1 or left = mid + 1
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    return result
+```
+
+## Binary Search on Answer: Concise Notes
+
+#### **1. How to Identify**
+
+1. **Optimization Problem**:
+
+   - Find the **minimum** or **maximum** value satisfying a condition (e.g., minimize largest, maximize smallest).
+
+2. **Monotonic Search Space**:
+
+   - If a value satisfies the condition, all larger (or smaller) values also satisfy it.
+
+3. **Helper Function**:
+
+   - A function `can_satisfy(value)` exists to verify if a value meets the condition (usually O(n)).
+
+4. **Common Problems**
+
+   - **Split Array Largest Sum** (Minimize largest subarray sum).
+   - **Koko Eating Bananas** (Minimize eating speed).
+   - **Aggressive Cows** (Maximize minimum distance).
+   - **Allocate Minimum Pages** (Minimize pages per student).
+
+5. **Key Idea**: Binary search efficiently narrows the range of possible answers; the helper function validates feasibility at each step.
+
+```python
+def binary_search_on_answer(arr, condition_fn, low, high):
+    while low <= high:
+        mid = low + (high - low) // 2
+        if condition_fn(mid, arr):
+            high = mid - 1  # Try for a smaller/larger valid value
+        else:
+            low = mid + 1  # Discard invalid values
+    return low
+```
+
+## Binary Search on Unsorted Arrays: Concise Notes
+
+#### **1. When to Apply**
+
+- **Input is not fully sorted**, but the problem has a **monotonic property** or a specific structure:
+
+  1. Rotated Sorted Arrays.
+  2. Peak Element or Mountain Arrays.
+  3. Virtual/Conceptual Search Spaces (e.g., infinite arrays).
+
+- **Key Requirement**:
+
+  - The **search space** or **conditions** allow the array to be divided into parts where binary search can narrow down the range.
+
+#### **2. Key Problems**
+
+1. **Search in Rotated Sorted Array**: Narrow down the range using rotation logic.
+2. **Find Peak Element**: Use binary search to locate a peak.
+3. **Find Minimum in Rotated Array**: Locate the point of rotation.
+
+#### **3. Template**
+
+- **Core Idea**: Identify the property to decide which half of the array to discard.
+
+#### **4. Examples:** 
+
+**Problem Find Peak Element**: Find an element that is greater than its neighbors in an unsorted array.
+
+```
+def find_peak_element(nums):
+    left, right = 0, len(nums) - 1
+    while left < right:
+        mid = left + (right - left) // 2
+        if nums[mid] < nums[mid + 1]:  # Move toward the peak
+            left = mid + 1
+        else:  # Discard the right part
+            right = mid
+    return left
+```
+
+**Searching in a rotated sorted array**:
+
+```python
+def search_in_rotated_array(nums, target):
+    left, right = 0, len(nums) - 1
+    while left <= right:
+        mid = left + (right - left) // 2
+
+        # If target is found
+        if nums[mid] == target:
+            return mid
+
+        # Determine which side is sorted
+        if nums[left] <= nums[mid]:  # Left half is sorted
+            if nums[left] <= target < nums[mid]:
+                right = mid - 1  # Target is in the left half
+            else:
+                left = mid + 1  # Target is in the right half
+        else:  # Right half is sorted
+            if nums[mid] < target <= nums[right]:
+                left = mid + 1  # Target is in the right half
+            else:
+                right = mid - 1  # Target is in the left half
+
+    return -1  # Target not found
+```
+
+#### **5. Explanation**
+
+- **Monotonic Property**:
+  - If `nums[mid] < nums[mid + 1]`, the peak must lie in the right half.
+  - Else, it lies in the left half.
+- **Termination**: `left == right`, pointing to the peak element.
+
+This pattern efficiently handles problems where the **array isn’t fully sorted**, but **binary search works due to conceptual or monotonic properties**.
+
+# Heaps
+
+## 1. Kth Largest/Smallest Element
+
+#### **Pattern Overview**
+
+- Use a **min-heap** for finding the kth largest element.
+- Use a **max-heap** for finding the kth smallest element.
+- The idea is to maintain a heap of size `k` that tracks the desired elements efficiently.
+
+#### **Common Problems**
+
+1. Kth Largest Element in an Array.
+2. Kth Smallest Element in a Sorted Matrix.
+
+#### **Key Points**
+
+- Min-heap is used for the kth largest because the smallest element in the heap is replaced once the size exceeds `k`.
+- Max-heap is used for the kth smallest by negating the values (since Python's `heapq` is a min-heap by default).
+
+#### **Example Code**
+
+```python
+import heapq
+
+# Kth Largest Element in an Array
+def findKthLargest(nums, k):
+    min_heap = []
+    for num in nums:
+        heapq.heappush(min_heap, num)
+        if len(min_heap) > k:
+            heapq.heappop(min_heap)
+    return min_heap[0]
+```
+
+## 2. Top K Elements
+
+#### **Pattern Overview**
+
+- Use a **heap** to efficiently retrieve the top `k` elements based on custom criteria (e.g., frequency, value).
+- Combine **heap operations** with frequency maps or sorted structures.
+
+#### **Common Problems**
+
+1. Top K Frequent Elements.
+2. Top K Frequent Words.
+
+#### **Key Points**
+
+- Use a **max-heap** if k elements need to be sorted in descending order.
+- Use a **min-heap** to maintain a heap of size `k`.
+
+#### **Example Code**
+
+```python
+# Top K Frequent Elements
+from collections import Counter
+import heapq
+
+def topKFrequent(nums, k):
+    freq_map = Counter(nums)
+    min_heap = []
+    
+    for num, freq in freq_map.items():
+        heapq.heappush(min_heap, (freq, num))
+        if len(min_heap) > k:
+            heapq.heappop(min_heap)
+    
+    return [num for freq, num in min_heap]
+```
+
+## 3. Merge K Sorted Lists/Arrays
+
+#### **Pattern Overview**
+
+- Use a **min-heap** to efficiently merge k sorted arrays or lists.
+- The heap is used to track the smallest element from each array, and the result is built incrementally.
+
+#### **Common Problems**
+
+1. Merge K Sorted Lists.
+2. Smallest Range Covering Elements from K Lists.
+
+#### **Key Points**
+
+- Push the first element of each list/array into the heap with an identifier (e.g., index).
+- Extract the smallest element, add it to the result, and push the next element from the same list into the heap.
+
+#### **Example Code**
+
+```python
+import heapq
+
+# Merge K Sorted Lists
+def mergeKLists(lists):
+    min_heap = []
+    
+    # Push initial elements of each list into the heap
+    for i, lst in enumerate(lists):
+        if lst:
+            heapq.heappush(min_heap, (lst[0], i, 0))  # (value, list index, element index)
+    
+    result = []
+    while min_heap:
+        val, list_idx, elem_idx = heapq.heappop(min_heap)
+        result.append(val)
+        if elem_idx + 1 < len(lists[list_idx]):
+            heapq.heappush(min_heap, (lists[list_idx][elem_idx + 1], list_idx, elem_idx + 1))
+    
+    return result
+```
+
+## 4. Two Heaps Pattern
+
+#### **Pattern Overview**
+
+- Use **two heaps** (max-heap and min-heap) to efficiently manage data in two halves.
+- Useful for problems requiring **median calculation** or **balancing data partitions**.
+
+#### **Common Problems**
+
+1. Find Median from Data Stream.
+2. Sliding Window Median.
+
+#### **Key Points**
+
+- Use a **max-heap** for the left half of the data and a **min-heap** for the right half.
+- Maintain the size property:
+  - Max-heap can have at most one more element than the min-heap.
+
+#### **Example Code**
+
+```python
+import heapq
+
+# Find Median from Data Stream
+class MedianFinder:
+    def __init__(self):
+        self.small = []  # Max-heap for the smaller half (invert values for max-heap)
+        self.large = []  # Min-heap for the larger half
+    
+    def addNum(self, num):
+        heapq.heappush(self.small, -num)
+        heapq.heappush(self.large, -heapq.heappop(self.small))
+        
+        if len(self.small) < len(self.large):
+            heapq.heappush(self.small, -heapq.heappop(self.large))
+    
+    def findMedian(self):
+        if len(self.small) > len(self.large):
+            return -self.small[0]
+        return (-self.small[0] + self.large[0]) / 2.0
+```
+
+# Linked Lists
+
+### **1. Reversal-Based Pattern**
+
+**Template Code: Reverse a Linked List (Iterative)**
+
+```python
+def reverseList(head):
+    prev, curr = None, head
+    while curr:
+        next_node = curr.next
+        curr.next = prev
+        prev, curr = curr, next_node
+    return prev
+```
+
+**Common Problems**:
+
+- Reverse a Linked List.
+- Reverse Nodes in K-Groups.
+- Reverse Linked List II (Partial reversal).
+
+### **2. Delete a Node (Dummy Node Simplification)**
+
+**Template Code: Delete a Node in a Linked List**\
+*Delete a node when the head or a dummy node simplifies pointer handling.*
+
+```python
+def deleteNode(node):
+    node.val = node.next.val
+    node.next = node.next.next
+```
+
+**Common Problems**:
+
+- Delete Node in a Linked List (given node reference).
+- Remove Nth Node from the End of List (use dummy node + 2 pointers).
+
+### **3. Fast and Slow Pointer Pattern**
+
+**Template Code: Detect a Cycle in a Linked List**
+
+```python
+def hasCycle(head):
+    slow, fast = head, head
+    while fast and fast.next:
+        slow, fast = slow.next, fast.next.next
+        if slow == fast:
+            return True
+    return False
+```
+
+**Common Problems**:
+
+- Linked List Cycle Detection.
+- Find the Middle of the Linked List.
+- Detect Cycle and Return Starting Node.
+- Intersection of Two Linked Lists (length adjustment with pointers).
+
+### **4. Dummy Node for Simplification**
+
+**Template Code: Merge Two Sorted Lists**
+
+```python
+def mergeTwoLists(l1, l2):
+    dummy = ListNode(0)
+    curr = dummy
+    while l1 and l2:
+        if l1.val < l2.val:
+            curr.next, l1 = l1, l1.next
+        else:
+            curr.next, l2 = l2, l2.next
+        curr = curr.next
+    curr.next = l1 or l2
+    return dummy.next
+```
+
+**Common Problems**:
+
+- Merge Two Sorted Lists.
+- Add Two Numbers.
+- Partition List.
+- Merge K Sorted Lists (heap approach uses dummy node for simplicity).
+
+### **5. Linked List ListNode**
+
+```python
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+```
+
+# Trees
+
+#### 1. **DFS Traversals (Recursive & Iterative)**
+
+**Recursive DFS Template**:
+
+```python
+def dfs(node):
+    if not node:
+        return
+    # Preorder logic (process node)
+    dfs(node.left)
+    # Inorder logic (process node)
+    dfs(node.right)
+    # Postorder logic (process node)
+```
+
+**Iterative DFS (Inorder Example)**:
+
+```python
+def dfs_iterative(root):
+    stack, result = [], []
+    while stack or root:
+        while root:
+            stack.append(root)
+            root = root.left
+        root = stack.pop()
+        result.append(root.val)  # Process node
+        root = root.right
+    return result
+```
+
+#### 2. **BFS (Level Order Traversal)**
+
+**Template**:
+
+```python
+from collections import deque
+def bfs(root):
+    if not root:
+        return []
+    queue, result = deque([root]), []
+    while queue:
+        level = []
+        for _ in range(len(queue)):
+            node = queue.popleft()
+            level.append(node.val)  # Process node
+            if node.left: queue.append(node.left)
+            if node.right: queue.append(node.right)
+        result.append(level)
+    return result
+```
+
+#### 3. **Tree Construction (Preorder + Inorder Example)**
+
+**Template**:
+
+```python
+def build_tree(preorder, inorder):
+    if not preorder or not inorder:
+        return None
+    root_val = preorder.pop(0)
+    root = TreeNode(root_val)
+    idx = inorder.index(root_val)
+    root.left = build_tree(preorder, inorder[:idx])
+    root.right = build_tree(preorder, inorder[idx+1:])
+    return root
+```
+
+### **Binary Trees (Additional Patterns)**
+
+#### 1. **Symmetric Tree**:
+
+**Template**:
+
+```python
+def is_symmetric(root):
+    def check(left, right):
+        if not left and not right:
+            return True
+        if not left or not right or left.val != right.val:
+            return False
+        return check(left.left, right.right) and check(left.right, right.left)
+    return check(root.left, root.right) if root else True
+```
+
+#### 2. **Flatten Binary Tree to Linked List**:
+
+**Template**:
+
+```python
+def flatten(root):
+    def dfs(node):
+        if not node:
+            return None
+        left_tail = dfs(node.left)
+        right_tail = dfs(node.right)
+        if left_tail:
+            left_tail.right = node.right
+            node.right = node.left
+            node.left = None
+        return right_tail or left_tail or node
+    dfs(root)
+```
+
+#### 3. **Lowest Common Ancestor (LCA)**:
+
+**Template**:
+
+```python
+def lca(root, p, q):
+    if not root or root == p or root == q:
+        return root
+    left = lca(root.left, p, q)
+    right = lca(root.right, p, q)
+    return root if left and right else left or right
+```
+
+### **Binary Search Trees (BST Patterns)**
+
+#### 1. **Validate BST**:
+
+**Template**:
+
+```python
+def is_valid_bst(root):
+    def validate(node, low, high):
+        if not node:
+            return True
+        if not (low < node.val < high):
+            return False
+        return validate(node.left, low, node.val) and validate(node.right, node.val, high)
+    return validate(root, float('-inf'), float('inf'))
+```
+
+#### 2. **Search in BST**:
+
+**Template**:
+
+```python
+def search_bst(root, val):
+    if not root or root.val == val:
+        return root
+    return search_bst(root.left, val) if val < root.val else search_bst(root.right, val)
+```
+
+#### 3. **Kth Smallest Element in BST**:
+
+**Template**:
+
+```python
+def kth_smallest(root, k):
+    stack = []
+    while True:
+        while root:
+            stack.append(root)
+            root = root.left
+        root = stack.pop()
+        k -= 1
+        if k == 0:
+            return root.val
+        root = root.right
+```
+
+#### 4. **Convert Sorted Array to BST**:
+
+**Template**:
+
+```python
+def sorted_array_to_bst(nums):
+    if not nums:
+        return None
+    mid = len(nums) // 2
+    root = TreeNode(nums[mid])
+    root.left = sorted_array_to_bst(nums[:mid])
+    root.right = sorted_array_to_bst(nums[mid+1:])
+    return root
+```
+
+### Key Notes:
+
+1. **DFS/BFS**: DFS is used for depth-based operations (e.g., paths, height), while BFS is ideal for level-based operations.
+2. **Tree Construction**: Always rely on unique traversal pairs (e.g., Preorder + Inorder).
+3. **Binary Trees**: Focus on symmetry, serialization, and manipulation (invert/flatten).
+4. **BST**: Leverage sorted property for efficient search, validation, and construction.
