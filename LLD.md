@@ -1,6 +1,36 @@
 **RoadMap**
 
-Classes - Methods, Attributes, Class Variables, Class Methods 2) OOPS concepts - Abstraction, Polymorphism, Encapsulation, Inheritance 3) super() method 4) Design Principles - SOLID, DRY, KISS, YAGNI 5) Design Patterns - Only important ones - Singleton, Factory Method, Builder, Strategy, Observer 6) Importants concepts/classes to know - Unique ID generation, Desgining Rate Limiter (Token bucket, fixed window), Caching (LRU, LFU), Queue management (Asynchronous Processing of Tasks, Desiognning notifications Systems using message queue/observer patterns), time based schedulers like crons jobs, load balancing algorithms, Data Paginiation and limtiing results, Search and Fileting, Acces contro and permissions, Handling concurrency and synchronization, **File system organization (Searching), Parking Lot, Hotel management system, Amazon Pizza Question**
+Classes - Methods, Attributes, Class Variables, Class Methods 2) OOPS concepts - Abstraction, Polymorphism, Encapsulation, Inheritance 3) super() method 4) Design Principles - SOLID, DRY, KISS, YAGNI 5) Design Patterns - Only important ones - Singleton, Factory Method, Builder, Strategy, Observer 6) Importants concepts/classes to know - Unique ID generation, Desgining Rate Limiter (Token bucket, fixed window), Caching (LRU, LFU), Queue management (Asynchronous Processing of Tasks, Desiognning notifications Systems using message queue/observer patterns), time based schedulers like crons jobs, load balancing algorithms, Data Paginiation and limtiing results, Search and Fileting, Acces contro and permissions, Handling concurrency and synchronization
+
+**Important Questions to Practice:**
+
+ 1. **Pizza Shop Question**
+ 2. **Unix/linux File search question**
+ 3. **LRU Cache (Indirect uses too), with TTL**
+ 4. **LFU Cache**
+ 5. **Hotel Booking/Management System** 
+ 6. **<span style="font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica Neue, Arial, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, sans-serif; color: rgb(51, 61, 66); font-size: 14px">elevator system in a building</span>**
+ 7. **<mark data-color="#ffe066" style="background-color: #ffe066; color: inherit">Parking Lot Design</mark>**
+ 8. **Load Balancer**
+ 9. **File Management System**
+10. **URL shortner**
+11. **Income Calculator**
+12. **Hashtable**
+13. **Amazon Locker System (Scalable storage locker)**
+14. **Amazon Package Delivery System**
+15. **Amazon Validation of a Purchase class**
+16. **Design Calendar**
+17. **Abstract Data structure that supports find/add/retrieve/delete etc.**
+18. **Custom collection class - getRandome, add, retrieve etc.** 
+19. **Find Connected id given list of id's (friends, their tastes etc.)**
+20. **Historical search terms by frequency of search (Trie)**
+21. **API Gateway**
+22. **Games - Chess Game, Snake and Ladder, Wordle, Spell Bee, Sudoku etc.**
+23. **Rate Limiter** 
+24. **Common LLD Questions - Library, Vending Machine, Amazon Online shopping System, Movie ticket booking etc.** 
+25. **Notification System LLD**
+26. **Most frequent/vs least frequent in huge database - heap internals/Trie**
+27. **Autocomplete - Trie**
 
 # Classes and Methods
 

@@ -1,3 +1,30 @@
+'''
+Requirements:
+
+1) Design amazon locker system. Should have lockers and packages, of sizes S, M, L, XL, XXL
+2) Users should be able to select nearest locker for delivery (pick up) and return (drop off) of items from amazon. 
+3) For each delivery and return, Users will be given a unique code to open the locker. Once opened, the code will be reset and the user may not reopen the locker again. 
+4) Each locker may only be accessed during the stores operating hours
+5) If an item is not picked up in 3 business days, the item has to be returned to amazon and the locker should be available again
+
+Classes:
+
+1) Locker
+Attributes: locker_id, x, y, package, is_available, opening_time, closing_time, expiry_time, qr_code, size
+Methods: asign_package, release_package, is_within_operating_hours
+
+2) Package
+Attributes: package_id, x, y, delivery_time, is_return, size
+Methods: 
+
+3) LockerSystem
+(Singleton Class)
+Attributes: lockers (List[lockers]), count_of_available_lockers (dict, (key, val) -> (size, count))
+Methods: assign_package, release_package, find_nearest_locker, collect_expired_packages, collect_returns, add_locker (*important)
+
+'''
+
+
 import math
 import uuid
 from typing import List, Optional

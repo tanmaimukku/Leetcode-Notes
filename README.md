@@ -2087,3 +2087,15 @@ def sorted_array_to_bst(nums):
 2. **Tree Construction**: Always rely on unique traversal pairs (e.g., Preorder + Inorder).
 3. **Binary Trees**: Focus on symmetry, serialization, and manipulation (invert/flatten).
 4. **BST**: Leverage sorted property for efficient search, validation, and construction.
+
+### **Concise Notes on Propagating Results in Recursion**
+
+1. **Global Best Answer**: Use a global variable to track the best value across all nodes (e.g., max path sum, tree diameter). Subtree results help compute the local value, and the global variable holds the final answer.
+
+2. **Aggregate Subtree Results**: Combine results from left and right subtrees to compute the parent’s value, which may also be the final answer (e.g., count nodes, check balance).
+
+3. **Intermediate Results**: Propagate meaningful results upward to aid parent computations (e.g., LCA, path sums). Use special values (e.g., `-1`) to signal specific states.
+
+4. **Global State Updates**: Use external variables to track cumulative or specific results during recursion (e.g., count of good subtrees).
+
+5. **Key Idea**: Identify whether the task requires combining subtree results, tracking a global best, or propagating intermediate states. Optimize by only returning necessary information.
