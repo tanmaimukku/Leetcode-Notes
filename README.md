@@ -20,7 +20,7 @@ n = len(s)
 
 def backtrack(curr_partition, start):
     if start == n:
-        result.append(curr_partition)
+        result.append(curr_partition.copy())
         return
     
     for end in range(start + 1, n + 1):
@@ -1203,6 +1203,8 @@ def opposite_direction_with_sorting(arr):
 
 ## Same Direction Pointers (Not Sliding Window)
 
+**Note: In cases where you can modify input array, you can use 2 pointers, and overwrite the original array if your final answer is always smaller (length wise) than original array. We dont care about elements already processes, e.g. Encode String (aabbbb to a2b4)**
+
 This pattern involves two pointers (`left` and `right`) that move in the same direction. The **right pointer** moves first until a condition is met or unmet. Once the condition changes, the **left pointer** is adjusted to the position of the right pointer. This is **not a sliding window** since the left pointer does not increment gradually but instead jumps to match the right pointer.
 
 #### **Key Insights**
@@ -1831,15 +1833,23 @@ def reverseList(head):
 - Reverse Nodes in K-Groups.
 - Reverse Linked List II (Partial reversal).
 
-### **2. Delete a Node (Dummy Node Simplification)**
+### **2. Delete/Add a Node (Dummy Node Simplification)**
 
-**Template Code: Delete a Node in a Linked List**\
-*Delete a node when the head or a dummy node simplifies pointer handling.*
+**Template Code: Delete/Add a Node in a Linked List**\
+*Delete/add a node when the head or a dummy node simplifies pointer handling.*
 
 ```python
-def deleteNode(node):
-    node.val = node.next.val
-    node.next = node.next.next
+def add_node(prev, val):
+    new_node = ListNode(val, prev.next)
+    prev.next = new_node
+
+def delete_node(prev):
+    if not prev or not prev.next:
+        return None  # Nothing to delete
+    to_delete = prev.next
+    prev.next = to_delete.next
+    to_delete.next = None
+    return to_delete  # Return the deleted node
 ```
 
 **Common Problems**:
@@ -1935,6 +1945,10 @@ def dfs_iterative(root):
 ```
 
 #### 2. **BFS (Level Order Traversal)**
+
+ **Note: In BFS, you may also want vertical levels. You can maintain index structure (2\*level, 2\*level+1) (max width of binary tree) or level+1, level-1 (vertical order traversal) depending on type of problem**
+
+**You can also simulate BFS using DFS. Just append a new \[\] to levels when you encounter a new level, i.e level == len(levels). This eliminates the need of using a queue. This trick can be used in some problems.** 
 
 **Template**:
 
