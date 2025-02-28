@@ -234,6 +234,7 @@ def edge_list_to_adj_list(edges: list, n: int):
 1. **Mark node as visited**: When **enqueued** (immediately after adding to the queue).
 2. **Why?**: BFS processes nodes level by level, so marking when enqueuing prevents revisiting and ensures the shortest path is maintained.
 3. **No additional visited check**: Since nodes are marked visited when enqueued, they won’t be added to the queue again, making an additional check after dequeuing unnecessary.
+4. <span style="color: rgb(38, 38, 38)">By the way, normally for BFS, the main space complexity lies in the process rather than the initialization. For instance, for a BFS traversal in a tree, at any given moment, the queue would hold no more than 2 levels of tree nodes. Therefore, the space complexity of BFS traversal in a tree would depend on the</span>***<span>width</span>***<span style="color: rgb(38, 38, 38)">of the input tree.</span>
 
 #### **Key Points**:
 
@@ -430,6 +431,23 @@ def dfs_cycle(node, graph, visited, recursion_stack):
                 return True  # Cycle detected (If you don't do this, True won't be propogated)
         elif neighbor in recursion_stack:
             return True  # Cycle detected (back edge found)
+
+    # Backtrack: remove the node from the recursion stack
+    recursion_stack.remove(node)
+    return False
+
+def dfs_cycle(node, graph, visited, recursion_stack):
+    if node in recursion_stack:
+        return True
+    if node in visited:
+        return False
+    visited.add(node)  # Mark the node as visited
+    recursion_stack.add(node)  # Add the node to the current recursion stack
+
+    # Explore the neighbors
+    for neighbor in graph[node]:
+        if dfs_cycle(neighbor, graph, visited, recursion_stack):
+                return True  # Cycle detected (If you don't do this, True won't be propogated)
 
     # Backtrack: remove the node from the recursion stack
     recursion_stack.remove(node)
@@ -2113,3 +2131,55 @@ def sorted_array_to_bst(nums):
 4. **Global State Updates**: Use external variables to track cumulative or specific results during recursion (e.g., count of good subtrees).
 
 5. **Key Idea**: Identify whether the task requires combining subtree results, tracking a global best, or propagating intermediate states. Optimize by only returning necessary information.
+
+# Trie
+
+```python
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.end_of_word = False
+
+class Trie:
+
+    def __init__(self):
+        self.root = TrieNode()
+        
+    def insert(self, word: str) -> None:
+        curr = self.root
+        for ch in word:
+            if ch not in curr.children:
+                curr.children[ch] = TrieNode()
+            curr = curr.children[ch]
+        curr.end_of_word = True
+  
+    def search(self, word: str) -> bool:
+        curr = self.root
+        for ch in word:
+            if ch not in curr.children:
+                return False
+            curr = curr.children[ch]
+        return curr.end_of_word == True
+
+    def startsWith(self, prefix: str) -> bool:
+        curr = self.root
+        for ch in prefix:
+            if ch not in curr.children:
+                return False
+            curr = curr.children[ch]
+        return True
+
+    def dfs(self, root, word):
+            curr = root
+            for i in range(len(word)):
+                if word[i] != '.' and word[i] not in curr.children:
+                    return False
+                elif word[i]!= '.' and word[i] in curr.children:
+                    curr = curr.children[word[i]]
+                else:
+                    for child in curr.children:
+                        if self.dfs(curr.children[child], word[i+1:]):
+                            return True
+                    return False
+            return curr.end_of_word
+```
